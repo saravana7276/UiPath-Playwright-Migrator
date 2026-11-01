@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UiPath Playwright Migrator</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    pre code, textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-900 border-b border-slate-800 px-6 py-3.5 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400 flex items-center justify-center font-black text-white shadow-md shadow-sky-500/20 text-sm">
+        PW
+      </div>
+      <div>
+        <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+          UiPath Playwright Migrator
+          <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-medium">Migration Engine</span>
+        </h1>
+        <p class="text-xs text-slate-400">Migrate legacy UiPath workflows to developer-led Playwright test suites (TypeScript, Python, JS, C#)</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 text-xs">
+      <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> Multi-Language Ready
+      </span>
+      <button onclick="showSelectorGuide()" class="px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors">
+        Selector Standards
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- Left Sidebar: Test Suites & Migration History -->
+    <aside class="w-72 bg-slate-900/50 border-r border-slate-800 flex flex-col flex-shrink-0">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Activity History</h2>
+        <button onclick="loadTestsList()" title="Refresh" class="text-slate-400 hover:text-white text-xs">
+          ↻ Refresh
+        </button>
+      </div>
+      <div id="tests-list" class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar text-xs">
+        <div class="text-slate-500 text-center py-6">Loading test suites...</div>
+      </div>
+      <div class="p-3 border-t border-slate-800 bg-slate-900/80 text-xs text-slate-400 flex items-center justify-between">
+        <span>Target: <strong class="text-slate-200">Any Web App</strong></span>
+        <span>Engine: <strong class="text-emerald-400">Universal AST</strong></span>
+      </div>
+    </aside>
+
+    <!-- Center: Migration Studio -->
+    <main class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+
+      <!-- Configuration & Script Ingestion Card -->
+      <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">1. Ingest UiPath Workflow / RPA Script</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Supports any web framework (React, Angular, Vue, Portals, HTML5). Jira ticket ID is completely optional.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="loadSample('ecommerce')" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700">
+              Sample 1: E-Commerce & Checkout
+            </button>
+            <button onclick="loadSample('login')" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700">
+              Sample 2: Auth & Login Portal
+            </button>
+            <button onclick="loadSample('search')" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-purple-400 border border-slate-700">
+              Sample 3: Customer Search & Grid
+            </button>
+          </div>
+        </div>
+
+        <!-- Configuration Matrix -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">
+              Test Name / Suite Identifier:
+            </label>
+            <input id="input-test-name" type="text" value="Enterprise Checkout Journey" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500" />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">
+              Target Framework / Tool:
+            </label>
+            <select id="input-platform" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="universal">Universal / HTML5 Semantic</option>
+              <option value="react">React / Next.js (Test IDs)</option>
+              <option value="angular">Angular / Vue</option>
+              <option value="portal">Salesforce / ServiceNow / SAP</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">
+              Target Language:
+            </label>
+            <select id="input-language" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="typescript" selected>TypeScript (.spec.ts)</option>
+              <option value="python">Python (pytest-playwright)</option>
+              <option value="javascript">JavaScript (.spec.js)</option>
+              <option value="csharp">C# (.NET / NUnit)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">
+              Jira Ticket ID <span class="text-slate-500 font-normal">(Optional)</span>:
+            </label>
+            <input id="input-jira-id" type="text" placeholder="e.g. QA-5432 (Optional)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500" />
+          </div>
+        </div>
+
+        <!-- Script Input Area & File Upload -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5 text-xs">
+            <span class="font-medium text-slate-300">UiPath Script / XAML XML Content:</span>
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer text-sky-400 hover:text-sky-300 flex items-center gap-1">
+                <span>📁 Upload .xaml file</span>
+                <input id="file-upload" type="file" accept=".xaml,.xml,.txt,.json" class="hidden" onchange="handleFileUpload(event)" />
+              </label>
+              <button onclick="clearScriptInput()" class="text-slate-500 hover:text-slate-300">Clear</button>
+            </div>
+          </div>
+          <textarea id="script-input" rows="8" placeholder="Paste UiPath .xaml XML, <webctrl ... /> selectors, or Studio activity logs here..." class="w-full p-3 font-mono text-xs bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-sky-500 custom-scrollbar"></textarea>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="flex items-center justify-between pt-2">
+          <div class="flex items-center gap-3 text-xs text-slate-400">
+            <span class="flex items-center gap-1 text-emerald-400">✔ Universal Web Semantics</span>
+            <span class="flex items-center gap-1 text-emerald-400">✔ ARIA Roles & Test IDs</span>
+            <span class="flex items-center gap-1 text-emerald-400">✔ Auto-Waiting Enforced</span>
+            <span class="flex items-center gap-1 text-slate-500">❌ Zero Static Sleeps</span>
+          </div>
+          <button id="btn-migrate" onclick="triggerMigration()" class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-sky-500 via-indigo-600 to-purple-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs shadow-lg shadow-sky-500/25 flex items-center gap-2 transition-all">
+            <span>⚡ Migrate to Playwright</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Code Workspace & Test Execution Console -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Generated Playwright Spec Editor -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col space-y-3">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider">2. Generated Playwright Test Suite</h2>
+              <span id="spec-filename-label" class="text-xs text-sky-400 font-mono">No spec generated yet</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="saveCurrentSpec()" title="Save changes" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                💾 Save
+              </button>
+              <button onclick="copyGeneratedCode()" title="Copy to clipboard" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                📋 Copy
+              </button>
+              <button onclick="downloadSpecFile()" title="Download spec" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                ⬇ Download
+              </button>
+            </div>
+          </div>
+
+          <div class="relative flex-1">
+            <textarea id="spec-editor" rows="18" spellcheck="false" class="w-full h-full min-h-[380px] p-3 font-mono text-xs bg-slate-950 border border-slate-800 rounded-lg text-emerald-300 focus:outline-none focus:border-sky-500 custom-scrollbar leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <span class="text-xs text-slate-400" id="spec-meta-info">Ready to execute</span>
+            <button id="btn-run-test" onclick="runVerificationTest()" class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-2 transition-all">
+              <span>▶ Run Playwright Test</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Verification & Self-Healing Console -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col space-y-3">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider">3. Execution & Self-Healing Console</h2>
+              <span class="text-xs text-slate-400">Headless Chromium Verification Runner</span>
+            </div>
+            <span id="test-status-badge" class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+              Idle
+            </span>
+          </div>
+
+          <div class="relative flex-1">
+            <pre id="execution-logs" class="w-full h-full min-h-[380px] p-4 font-mono text-xs bg-black/70 border border-slate-800 rounded-lg text-slate-300 overflow-y-auto custom-scrollbar leading-relaxed">
+UiPath Playwright Migrator Ready.
+Supports TypeScript, Python, JavaScript, and C#.
+Click "⚡ Migrate to Playwright" to generate code, then "▶ Run Playwright Test" to verify.
+            </pre>
+          </div>
+
+          <!-- Self-Healing Summary Badge -->
+          <div id="healing-banner" class="hidden p-3 rounded-lg bg-sky-950/40 border border-sky-500/30 text-xs text-sky-200">
+            <div class="font-semibold text-sky-400 mb-0.5 flex items-center gap-1.5">
+              <span>🩺 Self-Healing Diagnostics Triggered</span>
+            </div>
+            <div id="healing-details" class="text-slate-300 font-mono text-xs"></div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    let currentSpecFile = '';
+
+    const SAMPLES = {
+      ecommerce: `<Sequence DisplayName="E-Commerce Checkout Workflow">
+  <ui:OpenBrowser Url="https://portal.example.com/shop" BrowserType="Chrome" />
+  <ui:Click Selector="&lt;html app='chrome.exe' /&gt;&lt;webctrl tag='a' class='nav-item-link' innertext='Adventures' /&gt;" />
+  <ui:Delay Duration="00:00:03" />
+  <ui:Click Selector="&lt;html app='chrome.exe' /&gt;&lt;webctrl tag='a' class='cta-button' innertext='Explore Now' /&gt;" />
+</Sequence>`,
+      login: `<Sequence DisplayName="Authentication and Login Flow">
+  <ui:OpenBrowser Url="https://portal.example.com/login" />
+  <ui:TypeInto Text="admin@enterprise.com" Selector="&lt;webctrl tag='input' name='username' type='email' placeholder='Enter your email' /&gt;" />
+  <ui:TypeInto Text="SecretPassword123" Selector="&lt;webctrl tag='input' name='password' type='password' placeholder='Password' /&gt;" />
+  <ui:Click Selector="&lt;webctrl tag='button' type='submit' innertext='Sign In' /&gt;" />
+</Sequence>`,
+      search: `<Sequence DisplayName="Customer Data Search and Filter">
+  <ui:OpenBrowser Url="https://portal.example.com/customers" />
+  <ui:TypeInto Text="Global Tech Industries" Selector="&lt;webctrl tag='input' type='search' placeholder='Search records...' /&gt;" />
+  <ui:Click Selector="&lt;webctrl tag='button' aria-label='Filter' /&gt;" />
+  <ui:Click Selector="&lt;webctrl tag='a' data-testid='view-customer-details' /&gt;" />
+</Sequence>`
+    };
+
+    function loadSample(key) {
+      document.getElementById('script-input').value = SAMPLES[key] || '';
+      if (key === 'ecommerce') document.getElementById('input-test-name').value = 'Enterprise Checkout Journey';
+      if (key === 'login') document.getElementById('input-test-name').value = 'Authentication and Login Flow';
+      if (key === 'search') document.getElementById('input-test-name').value = 'Customer Data Search and Filter';
+    }
+
+    function clearScriptInput() {
+      document.getElementById('script-input').value = '';
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('script-input').value = e.target.result;
+        document.getElementById('input-test-name').value = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9 ]/g, ' ');
+      };
+      reader.readAsText(file);
+    }
+
+    async function triggerMigration() {
+      const script = document.getElementById('script-input').value;
+      const testName = document.getElementById('input-test-name').value;
+      const ticketId = document.getElementById('input-jira-id').value;
+      const language = document.getElementById('input-language').value;
+
+      if (!script && !ticketId) {
+        alert('Please paste a UiPath script, upload a .xaml file, or specify an optional Jira ticket ID.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-migrate');
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳ Migrating to ${language}...</span>`;
+
+      try {
+        const res = await fetch('/api/migrate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ script, testName, ticketId, language })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          currentSpecFile = data.filename;
+          document.getElementById('spec-filename-label').textContent = `${data.filename} (${data.language.toUpperCase()})`;
+          document.getElementById('spec-editor').value = data.specCode;
+          document.getElementById('spec-meta-info').textContent = `Generated ${data.parsedStepsCount} step closures cleanly.`;
+          
+          document.getElementById('execution-logs').textContent = `✅ Successfully migrated UiPath workflow to Playwright (${data.language.toUpperCase()})!\nFile saved at: tests/${data.filename}\nClick "▶ Run Playwright Test" to execute.`;
+          
+          loadTestsList();
+        } else {
+          alert('Migration error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Network / Server Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡ Migrate to Playwright</span>`;
+      }
+    }
+
+    async function runVerificationTest() {
+      if (!currentSpecFile) {
+        alert('No spec selected. Please migrate a script or select a test from the left sidebar first.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-run-test');
+      const badge = document.getElementById('test-status-badge');
+      const consoleBox = document.getElementById('execution-logs');
+      const banner = document.getElementById('healing-banner');
+      banner.classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳ Running Playwright...</span>`;
+      badge.textContent = 'Running';
+      badge.className = 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30';
+      consoleBox.textContent = `▶️ Initializing Playwright runner on tests/${currentSpecFile}...\n`;
+
+      try {
+        const res = await fetch('/api/run-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: currentSpecFile })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          consoleBox.textContent = data.logs;
+          
+          if (data.passed) {
+            badge.textContent = `Passed (${data.attempts} attempt${data.attempts > 1 ? 's' : ''})`;
+            badge.className = 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+          } else {
+            badge.textContent = 'Failed';
+            badge.className = 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-red-500/20 text-red-400 border border-red-500/30';
+          }
+
+          if (data.healingActions && data.healingActions.length > 0) {
+            banner.classList.remove('hidden');
+            document.getElementById('healing-details').textContent = data.healingActions.map(a => `[Attempt ${a.attempt}]: ${a.log}`).join('\n');
+            document.getElementById('spec-editor').value = data.finalCode;
+          }
+        } else {
+          consoleBox.textContent += `\nExecution error: ${data.error}`;
+          badge.textContent = 'Error';
+          badge.className = 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-red-500/20 text-red-400 border border-red-500/30';
+        }
+      } catch (err) {
+        consoleBox.textContent += `\nServer error: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>▶ Run Playwright Test</span>`;
+      }
+    }
+
+    async function loadTestsList() {
+      const container = document.getElementById('tests-list');
+      try {
+        const res = await fetch('/api/tests');
+        const data = await res.json();
+
+        if (data.success && data.tests.length > 0) {
+          container.innerHTML = data.tests.map(t => `
+            <div onclick="selectSpec('${t.filename}')" class="p-3 rounded-lg border border-slate-800 bg-slate-950/60 hover:bg-slate-800/80 cursor-pointer transition-colors ${currentSpecFile === t.filename ? 'border-sky-500 bg-slate-800/90' : ''}">
+              <div class="font-semibold text-slate-200 truncate">${t.title}</div>
+              <div class="text-[11px] text-slate-400 font-mono truncate mt-0.5">${t.filename}</div>
+              <div class="text-[10px] text-slate-500 mt-1 flex items-center justify-between">
+                <span>${t.origin}</span>
+                <span>${Math.round(t.sizeBytes / 1024 * 10) / 10} KB</span>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = `<div class="text-slate-500 text-center py-6">No test specs found. Migrate one above!</div>`;
+        }
+      } catch (err) {
+        container.innerHTML = `<div class="text-red-400 text-center py-6">Error loading tests: ${err.message}</div>`;
+      }
+    }
+
+    async function selectSpec(filename) {
+      try {
+        const res = await fetch(`/api/spec?file=${encodeURIComponent(filename)}`);
+        const data = await res.json();
+        if (data.success) {
+          currentSpecFile = data.filename;
+          document.getElementById('spec-filename-label').textContent = data.filename;
+          document.getElementById('spec-editor').value = data.code;
+          document.getElementById('spec-meta-info').textContent = `Loaded from tests/${data.filename}`;
+          loadTestsList();
+        }
+      } catch (err) {
+        alert('Failed to load spec: ' + err.message);
+      }
+    }
+
+    async function saveCurrentSpec() {
+      if (!currentSpecFile) return;
+      const code = document.getElementById('spec-editor').value;
+      try {
+        const res = await fetch('/api/save-spec', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: currentSpecFile, code })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Saved successfully!');
+          loadTestsList();
+        }
+      } catch (err) {
+        alert('Save error: ' + err.message);
+      }
+    }
+
+    function copyGeneratedCode() {
+      const code = document.getElementById('spec-editor').value;
+      if (!code) return;
+      navigator.clipboard.writeText(code).then(() => alert('Copied code to clipboard!'));
+    }
+
+    function downloadSpecFile() {
+      const code = document.getElementById('spec-editor').value;
+      if (!code) return;
+      const blob = new Blob([code], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = currentSpecFile || 'migrated_test.txt';
+      a.click();
+    }
+
+    function showSelectorGuide() {
+      alert('UiPath Playwright Migrator Selector Priority:\n1. Test IDs: page.getByTestId()\n2. ARIA Roles: page.getByRole()\n3. Labels & Placeholders: page.getByLabel(), page.getByPlaceholder()\n4. Scoped CSS / Component Roots\n5. Auto-Waiting: Zero static sleeps');
+    }
+
+    window.onload = () => {
+      loadSample('ecommerce');
+      loadTestsList();
+    };
+  </script>
+</body>
+</html>
