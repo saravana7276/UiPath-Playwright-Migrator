@@ -17,13 +17,13 @@ test.describe('Generic web application journey', () => {
     });
 
     await test.step('Step 2: Verify and click navigation item', async () => {
-      const element = page.getByRole('link', { name: /home|products|services|support/i }).first();
+      const element = page.getByRole('link', { name: /home|adventures|services|support/i }).first();
       await expect(element).toBeVisible();
       await element.click();
     });
 
     await test.step('Step 3: Validate primary hero action', async () => {
-      const element = page.getByRole('button', { name: /start|continue|try now|learn more/i }).first();
+      const element = page.getByRole('link', { name: /explore|start|continue|learn more/i }).first();
       await expect(element).toBeVisible();
       await element.click();
     });

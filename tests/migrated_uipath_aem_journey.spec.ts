@@ -17,13 +17,13 @@ test.describe('Migrated UiPath web journey', () => {
     });
 
     await test.step('Step 2: Click a navigation item', async () => {
-      const element = page.getByRole('link', { name: /home|products|services|overview/i }).first();
+      const element = page.getByRole('link', { name: /home|adventures|services|overview/i }).first();
       await expect(element).toBeVisible();
       await element.click();
     });
 
     await test.step('Step 3: Trigger a primary action', async () => {
-      const element = page.getByRole('button', { name: /start|continue|submit|next/i }).first();
+      const element = page.getByRole('link', { name: /explore|start|continue|next/i }).first();
       await expect(element).toBeVisible();
       await element.click();
     });
